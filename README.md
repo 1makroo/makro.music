@@ -1,6 +1,6 @@
-# Local Discord Music Bot
+# Makro Discord Music Bot
 
-A self-hosted Discord music bot template. Anyone can clone it, add their own bot token, and run it locally for their own Discord server.
+A self-hosted Discord music bot template. Anyone can clone it, add their own bot token, and run it for free on their own PC, home server, VPS, or Docker host.
 
 ## Features
 
@@ -16,10 +16,20 @@ A self-hosted Discord music bot template. Anyone can clone it, add their own bot
 
 ## Requirements
 
+For local Python hosting:
+
 - Python 3.10+
 - [FFmpeg](https://ffmpeg.org/download.html) installed and available on your `PATH`
 - A Discord bot token
 - Optional Spotify developer app credentials for Spotify links
+
+For Docker hosting:
+
+- Docker with the Docker Compose plugin
+- A Discord bot token
+- Optional Spotify developer app credentials for Spotify links
+
+The Docker image installs FFmpeg and Opus support inside the container.
 
 ## Discord bot setup
 
@@ -71,16 +81,68 @@ Then edit `.env`:
 
 ```env
 DISCORD_TOKEN=your-token-here
-SPOTIFY_CLIENT_ID=optional
-SPOTIFY_CLIENT_SECRET=optional
+SPOTIFY_CLIENT_ID=
+SPOTIFY_CLIENT_SECRET=
 MAX_PLAYLIST_ITEMS=50
+LOG_LEVEL=INFO
+# Optional: sync slash commands instantly to one server instead of globally.
+# DISCORD_GUILD_ID=your-server-id
 ```
 
-## Run
+## Run locally with Python
 
 ```bash
 python bot.py
 ```
+
+## Run with Docker Compose
+
+This is the recommended setup for servers, home labs, NAS boxes, VPS hosts.
+The bot does not expose any inbound ports; it only needs outbound internet access to Discord, YouTube/other media sites, and Spotify if enabled.
+
+1. Install Docker and the Compose plugin.
+2. Clone this repository.
+3. Create your environment file:
+
+   ```bash
+   cp .env.example .env
+   nano .env
+   ```
+
+4. Start the bot:
+
+   ```bash
+   docker compose up -d --build
+   ```
+
+5. Watch logs:
+
+   ```bash
+   docker compose logs -f makro-music
+   ```
+
+Useful Docker commands:
+
+```bash
+# Stop the bot
+docker compose down
+
+# Restart the bot
+docker compose restart
+
+# Rebuild after pulling code updates
+docker compose up -d --build
+```
+
+The Compose file uses `restart: unless-stopped`, so Docker will restart the bot after reboots or container crashes unless you manually stop it.
+
+If slash commands do not appear quickly, add `DISCORD_GUILD_ID` to `.env` with your Discord server ID and restart the container. Guild-scoped slash commands usually sync much faster than global commands.
+
+## Notes for public/self-hosted use
+
+- You do not need to open or forward any router ports.
+- Leave `SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET` blank unless you create Spotify API credentials.
+- YouTube and other media sites can change behavior over time.
 
 ## Commands
 
